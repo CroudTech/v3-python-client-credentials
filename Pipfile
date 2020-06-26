@@ -10,9 +10,10 @@ flake8-bugbear = "*"
 isort = "*"
 pytest = "*"
 pytest-cov = "*"
-pytest-mock = "*"
+pytest-httpx = "*"
 
 [packages]
+asgiref = "*"
 cacheout = "*"
 httpx = "*"
 

@@ -3,6 +3,7 @@ import time
 from typing import Mapping, Optional
 
 import httpx
+from asgiref.sync import async_to_sync
 from cacheout import Cache
 
 
@@ -25,19 +26,25 @@ def _get_request_data(client):
     }
 
 
-def _fetch_token(data):
+async def _fetch_token(data):
     cache_key = tuple(data.values())
     if cache_key in token_cache:
         return token_cache.get(cache_key)
-    response = httpx.post(os.environ["AUTH_TOKEN_URL"], data=data)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(os.environ["AUTH_TOKEN_URL"], data=data)
     token_json = response.json()
-    token_cache.set(cache_key, token_json, ttl=token_json["expires_in"])
+    token_cache.set(
+        cache_key, token_json["access_token"], ttl=token_json["expires_in"] - 2
+    )
     return token_json["access_token"]
 
 
-def get_token(
+async def get_token_async(
     client: Optional[str] = None, headers: Optional[Mapping[str, str]] = None
 ) -> str:
     if headers and "Authorization" in headers:
         return headers["Authorization"].replace("Bearer ", "", 1)
-    return _fetch_token(_get_request_data(client))
+    return await _fetch_token(_get_request_data(client))
+
+
+get_token = async_to_sync(get_token_async)
