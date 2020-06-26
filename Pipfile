@@ -5,12 +5,14 @@ verify_ssl = true
 
 [dev-packages]
 black = "==19.10b0"
+docutils = "*"
 flake8 = "*"
 flake8-bugbear = "*"
 isort = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-httpx = "*"
+rstcheck = "*"
 
 [packages]
 asgiref = "*"
