@@ -6,7 +6,6 @@ import httpx
 from asgiref.sync import async_to_sync
 from cacheout import Cache
 
-
 token_cache = Cache(maxsize=1000, ttl=300, timer=time.monotonic)
 
 
@@ -43,8 +42,12 @@ async def get_token_async(
     client: Optional[str] = None, headers: Optional[Mapping[str, str]] = None
 ) -> str:
     if headers and "Authorization" in headers:
-        return headers["Authorization"].replace("Bearer ", "", 1)
-    return await _fetch_token(_get_request_data(client))
+        return headers
+    if headers is None:
+        headers = {}
+    token = await _fetch_token(_get_request_data(client))
+    headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 get_token = async_to_sync(get_token_async)
