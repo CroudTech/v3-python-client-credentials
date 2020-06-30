@@ -13,6 +13,7 @@ pytest = "*"
 pytest-cov = "*"
 pytest-httpx = "*"
 rstcheck = "*"
+twine = "*"
 
 [packages]
 asgiref = "*"
