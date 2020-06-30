@@ -29,6 +29,11 @@ jobs:
       - name: Run isort
         run: isort -c
       - name: Run tests
+        env:
+          AUTH_TOKEN_URL: http://example.com/token
+          AUTH_CLIENT_ID_DEFAULT: cc-test
+          AUTH_CLIENT_SECRET_DEFAULT: secret
+          AUTH_CLIENT_SCOPE_DEFAULT: test
         run: python -m pytest
       - name: Publish to Gemfury
         env:
