@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.8"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip pipenv
+          pipenv install --dev --system --deploy
+      - name: Run black
+        run: black . --check
+      - name: Run flake8
+        run: flake8 --count --show-source --statistics
+      - name: Run isort
+        run: isort -c
+      - name: Run tests
+        env:
+          AUTH_TOKEN_URL: http://example.com/token
+          AUTH_CLIENT_ID_DEFAULT: cc-test
+          AUTH_CLIENT_SECRET_DEFAULT: secret
+          AUTH_CLIENT_SCOPE_DEFAULT: test
+        run: python -m pytest
+      - name: Publish to Gemfury
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
+        if: ${{ github.event_name == 'push' && github.ref == 'master' }}
+        run: |
+          python setup.py build sdist bdist_wheel
+          twine upload --password "" dist/*
