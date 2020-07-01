@@ -39,7 +39,7 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
-        if: ${{ github.event_name == 'push' && github.ref == 'master' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: |
           python setup.py build sdist bdist_wheel
           twine upload --password "" dist/*
